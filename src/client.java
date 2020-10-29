@@ -15,7 +15,14 @@ public class dataSocket {
 		socket.setSoTimeout(3000); //times out and closes client if nothing is returned
 
 		DatagramPacket blank = new DatagramPacket(buffer,0,address,port); //sending a blank packet to the server
-		DatagramPacket blank = new DatagramPacket(
+		socket.send(blank);
+		
+		while(true){ //the FileRetriever that gets all the files
+			DatagramPacket data = new DatagramPacket(buffer2,0,buffer.length);
+			socket.receive(data);
+
+			
+		}
 
 	}
 
