@@ -1,9 +1,11 @@
-public class main{
+import java.io.IOException;
+
+public class main {
 	public static void main(String[] args) throws IOException {
+        
         String server = "localhost";
-        // CHANGE THIS DEFAULT PORT TO THE PORT NUMBER PROVIDED
-        // BY THE INSTRUCTOR.
-        int port = 6013;
+
+        int port = 6014;
         
         if (args.length >= 1) {
             server = args[0];
@@ -12,8 +14,8 @@ public class main{
             port = Integer.parseInt(args[1]);
         }
 
-		FileReceiver dog = new FileReceiver(port);
-		dog.getFiles();
+		FileReceiver receiver = new FileReceiver(server, port);
+		receiver.getFiles(); //gets the files which is made up of the packets
     }
 }
 
