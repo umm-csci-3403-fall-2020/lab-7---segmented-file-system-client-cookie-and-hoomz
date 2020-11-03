@@ -1,9 +1,7 @@
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 
 public class FileReceiver {
     public int port = 6014;
@@ -14,7 +12,7 @@ public class FileReceiver {
         this.port = port;
     }
 
-    public void getFiles() throws IOException{
+    public void downloadFiles() throws IOException{
         DatagramSocket socket = new DatagramSocket(port); // socket attached to my computer's port
         InetAddress address = InetAddress.getByName(server); //grabbing the server
         byte[] buffer = new byte[65507]; // buffer with max size of 65507

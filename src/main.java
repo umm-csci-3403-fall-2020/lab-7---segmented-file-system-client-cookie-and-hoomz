@@ -15,7 +15,7 @@ public class main {
         }
 
 		FileReceiver receiver = new FileReceiver(server, port);
-		receiver.getFiles(); //gets the files which is made up of the packets
+		receiver.downloadFiles(); //gets the files which is made up of the packets
     }
 }
 

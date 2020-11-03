@@ -16,20 +16,23 @@ public class DataPacket {
         this.last = last;
     }
 
+    public byte getFileID(DataPacket data){ //returns the fileID of a data packet
+        return data.fileID;
+    }
+
+    public boolean getLast(DataPacket data){
+        return data.last;
+    }
+
+    public int getPacketNumber(DataPacket data){
+        return data.packetNumber;
+    }
+
     // public int getPacketNum(byte[] packet){
     //     int valOne = Byte.toUnsignedInt(packet[2]); //conversion since java supports signed ints (-128 to 127)
     //     int valTwo = Byte.toUnsignedInt(packet[3]);
     //     packetNumber = 256*valOne+valTwo;
     //     return packetNumber;
-    // }
-
-    // public boolean lastPack(byte[] packet){
-    //     boolean last = false;
-    //     byte status = packet[0];
-    //     if (status%4==3){
-    //         last = true;
-    //     }
-    //     return last;
     // }
 
     // public byte getFileID(byte[] packet){ //returns the fileID of a header packet
