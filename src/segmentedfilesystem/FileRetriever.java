@@ -13,7 +13,7 @@ public class FileRetriever {
         this.port = port;
     }
 
-    public void downloadFiles() throws IOException{
+    public void downloadFiles() throws IOException{ //download and write out the files
         DatagramSocket socket = new DatagramSocket(port); // socket attached to my computer's port
         InetAddress address = InetAddress.getByName(server); //grabbing the server
         byte[] buffer = new byte[65507]; // buffer with max size of 65507
@@ -25,7 +25,7 @@ public class FileRetriever {
         byte[] buffer2 = new byte[65507]; // buffer with max size of 65507, can accept things up to that size
         PacketManager boss = new PacketManager();
 
-        while(true){
+        while(true){ //need method to end loop when all files are received
             DatagramPacket data = new DatagramPacket(buffer2,buffer.length);
             socket.receive(data); //receive the incoming packet
             byte[] aPacket = data.getData();

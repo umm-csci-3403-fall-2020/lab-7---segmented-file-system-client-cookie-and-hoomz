@@ -1,5 +1,6 @@
 package segmentedfilesystem;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class PacketManager {
     }
 
     public void createPack(byte[] aPacket){ //creates the header and data packets
-        if (isHeader(aPacket[0])== true){
+        if (isHeader(aPacket[0])== true){ //determining which file each packet is a part of
             newHeader(aPacket);
         }
         if (isHeader(aPacket[0]) != true){
@@ -138,9 +139,10 @@ public class PacketManager {
         return map;
     }
 
-    public void buildFile(List<HeaderPacket> headerList){
+    public File buildFile(List<HeaderPacket> headerList, List<DataPacket> dataList){ //need to match the header with its data packets
         for (int i = 0; i < headerList.size(); i++){
             HeaderPacket header = headerList.get(i);
+            byte ID = header.getFileID();
             byte[] name = header.getFileName();
         }
     }
