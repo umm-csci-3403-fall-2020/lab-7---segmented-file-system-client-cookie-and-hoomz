@@ -16,16 +16,20 @@ public class DataPacket {
         this.last = last;
     }
 
-    public byte getFileID(DataPacket data){ //returns the fileID of a data packet
-        return data.fileID;
+    public byte getFileID(){ //returns the fileID of a data packet
+        return this.fileID;
     }
 
-    public boolean getLast(DataPacket data){
-        return data.last;
+    public boolean getLast(){
+        return this.last;
     }
 
-    public int getPacketNumber(DataPacket data){
-        return data.packetNumber;
+    public int getPacketNumber(){
+        return this.packetNumber;
+    }
+
+    public byte[] getDataInfo(){
+        return this.info;
     }
 
     // public int getPacketNum(byte[] packet){

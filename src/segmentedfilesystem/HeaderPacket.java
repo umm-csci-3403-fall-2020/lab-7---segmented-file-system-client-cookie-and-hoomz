@@ -12,18 +12,17 @@ public class HeaderPacket {
         this.fileName = fileName;
     }
 
-    // public String getFileName(byte[]packet){ //returns the fileName of a file given the header packet
-    //     String fileName = new String(packet, 2, packet.length);
-    //     return fileName;
-    // }
+    public byte[] getFileName(){ //returns the fileName of a file given the header packet
+        return this.fileName;
+    }
 
     // public byte getFileID(byte[] packet){ //returns the fileID of a data packet
     //     byte fileID = packet[1];
     //     return fileID;
     // }
-    public byte getFileID(HeaderPacket header){ //returns the fileID of a data packet
+    public byte getFileID(){ //returns the fileID of a data packet
         //byte fileID = packet[1];
-        return header.fileID;
+        return this.fileID;
     }
 
 
