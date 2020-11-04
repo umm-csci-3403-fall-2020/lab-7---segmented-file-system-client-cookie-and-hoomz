@@ -25,7 +25,7 @@ public class FileRetriever {
         byte[] buffer2 = new byte[65507]; // buffer with max size of 65507, can accept things up to that size
         PacketManager boss = new PacketManager();
 
-        while(true){ //need method to end loop when all files are received
+        while(!boss.isFinished()){ //need method to end loop when all files are received
             DatagramPacket data = new DatagramPacket(buffer2,buffer.length);
             socket.receive(data); //receive the incoming packet
             byte[] aPacket = data.getData();

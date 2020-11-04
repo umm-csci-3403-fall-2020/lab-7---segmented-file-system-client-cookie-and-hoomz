@@ -21,11 +21,22 @@ public class DataPacket {
     }
 
     public boolean getLast(){
-        return this.last;
+        byte status = packet[0];
+        if (status % 4 == 3) {
+            last = true;
+        }
+        return last;
     }
 
+    // public int getPacketNumber(){
+    //     return this.packetNumber;
+    // }
     public int getPacketNumber(){
-        return this.packetNumber;
+        int packetNumber;
+        int valOne = Byte.toUnsignedInt(packet[2]); //conversion since java supports signed ints (-128 to 127)
+        int valTwo = Byte.toUnsignedInt(packet[3]);
+        packetNumber = 256*valOne+valTwo;
+        return packetNumber;
     }
 
     public byte[] getDataInfo(){
