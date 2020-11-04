@@ -119,7 +119,7 @@ public class PacketManager {
                          // (ex: 111122333333)
     }
 
-    public boolean isFinished(){
+    public boolean isDataFinished(){
         boolean finished = false;
         int packetTotal = 0;
         int size = dataList.size();
@@ -134,6 +134,22 @@ public class PacketManager {
             finished = true;
         }
         return finished;
+    }
+
+    public boolean isHeaderFinished(){
+        boolean finished = false;
+        if (headerList.size() == 3){
+            finished = true;
+        }
+        return finished;
+    }
+
+    public boolean theEnd(){
+        boolean done = false;
+        if (isDataFinished() == true && isHeaderFinished() == true){
+            done = true;
+        }
+        return done;
     }
 
     // List<DataPacket> file1Prep = populate(dataList);
