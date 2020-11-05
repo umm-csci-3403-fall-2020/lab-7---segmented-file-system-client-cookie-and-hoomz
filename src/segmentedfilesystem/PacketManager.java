@@ -20,9 +20,9 @@ public class PacketManager {
     List<HeaderPacket> headerList;
     List<DataPacket> dataList;
 
-    public PacketManager() {
-        this.headerList = new ArrayList<HeaderPacket>();
-        this.dataList = new ArrayList<DataPacket>();
+    public PacketManager(List<HeaderPacket> headerList, List<DataPacket> dataList){
+       this.headerList = new ArrayList<HeaderPacket>();
+       this.dataList = new ArrayList<DataPacket>();
     }
 
     public boolean isHeader(byte status) { // determines if a packet is a header packet or not

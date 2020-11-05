@@ -3,21 +3,25 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 public class FileRetriever {
-    public int port = 6014;
+    int port;
     String server;
+    DatagramSocket socket = new DatagramSocket();
 
-    public FileRetriever(String server, int port) {
+    public FileRetriever(String server, int port, DatagramSocket socket) throws UnknownHostException, SocketException {
         this.server = server;
         this.port = port;
+	this.socket = socket;
     }
 
     public void downloadFiles() throws IOException{ //download and write out the files
-        DatagramSocket socket = new DatagramSocket(port); // socket attached to my computer's port
+        //DatagramSocket socket = new DatagramSocket(); // socket attached to my computer's port
         InetAddress address = InetAddress.getByName(server); //grabbing the server
         byte[] buffer = new byte[65507]; // buffer with max size of 65507
-        socket.setSoTimeout(3000); // times out and closes if nothing is returned, will also break while loop
+       	socket.setSoTimeout(3000); // times out and closes if nothing is returned, will also break while loop
 
         DatagramPacket blank = new DatagramPacket(buffer, buffer.length, address, port); //starting connection
         socket.send(blank); //sends a blank datagram packet to the server to establish connection
