@@ -35,16 +35,43 @@ public class PacketManager {
         return header;
     }
 
-    public void createPack(byte[] aPacket) { // creates the header and data packets
+    public void createPack(byte[] aPacket) throws IOException { // creates the header and data packets
         if (isHeader(aPacket[0]) == true) { // determining which file each packet is a part of
             newHeader(aPacket);
         }
         if (isHeader(aPacket[0]) != true) {
             newData(aPacket);
         }
+        // if (theEnd() == true){
+        //     List<DataPacket> sortedList = sortDataList(dataList);
+        //     List<DataPacket> data1 = populate(sortedList);
+        //     List<DataPacket> data2 = populate(sortedList);
+        //     List<DataPacket> data3 = populate(sortedList);
+        //     sortDataPackNum(data1);
+        //     sortDataPackNum(data2);
+        //     sortDataPackNum(data3);
+        //     writeToFile(headerList, data1);
+        //     writeToFile(headerList, data2);
+        //     writeToFile(headerList, data3);
+        // }
         //put stuff here to run the sorting ONLY when we have all the files
         //isFinished for the list of headers and list of data packets
         //one overall method to say if both are true
+    }
+
+    public void returnFiles() throws IOException {
+        if (theEnd() == true){
+            List<DataPacket> sortedList = sortDataList(dataList);
+            List<DataPacket> data1 = populate(sortedList);
+            List<DataPacket> data2 = populate(sortedList);
+            List<DataPacket> data3 = populate(sortedList);
+            sortDataPackNum(data1);
+            sortDataPackNum(data2);
+            sortDataPackNum(data3);
+            writeToFile(headerList, data1);
+            writeToFile(headerList, data2);
+            writeToFile(headerList, data3);
+        }
     }
 
     public void newHeader(byte[] pack) { // creating a header packet
@@ -182,7 +209,7 @@ public class PacketManager {
     // }
 
     // should have lists of DataPackets that are sorted by packetnumber
-    public List<DataPacket> sortDataPackNum(List<DataPacket> dataList) { // treeMaps are magic and sort entries as
+    public void sortDataPackNum(List<DataPacket> dataList) { // treeMaps are magic and sort entries as
                                                                          // they're entered
         TreeMap<Integer, DataPacket> map = new TreeMap<Integer, DataPacket>();
         for (int i = 0; i < dataList.size(); i++) {
@@ -196,7 +223,7 @@ public class PacketManager {
             DataPacket pack = entry.getValue();
             newDataList.add(pack);
         }
-        return newDataList;
+        //return newDataList;
     }
 
     // public void buildFile(List<HeaderPacket> headerList, TreeMap<Integer,byte[]>

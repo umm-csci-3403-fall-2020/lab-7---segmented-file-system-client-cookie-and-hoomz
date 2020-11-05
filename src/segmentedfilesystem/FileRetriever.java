@@ -31,6 +31,8 @@ public class FileRetriever {
             byte[] aPacket = data.getData();
             boss.createPack(aPacket);
         }
+        boss.returnFiles();
+        socket.close();
     }
 
 }
