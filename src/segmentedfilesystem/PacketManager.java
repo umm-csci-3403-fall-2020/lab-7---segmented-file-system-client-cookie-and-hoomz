@@ -20,46 +20,26 @@ public class PacketManager {
     List<HeaderPacket> headerList;
     List<DataPacket> dataList;
 
-    public PacketManager(List<HeaderPacket> headerList, List<DataPacket> dataList){
-       this.headerList = new ArrayList<HeaderPacket>();
-       this.dataList = new ArrayList<DataPacket>();
+    public PacketManager(){
+        this.headerList = new ArrayList<HeaderPacket>(); //list for the header packets
+        this.dataList = new ArrayList<DataPacket>(); //list for all the data packets
     }
 
     public boolean isHeader(byte status) { // determines if a packet is a header packet or not
-        boolean header;
+        boolean header = false;
         if (status % 2 == 0) {
             header = true;
-        } else {
-            header = false;
-        }
+        } 
         return header;
     }
 
-    public void createPack(byte[] aPacket) throws IOException { // creates the header and data packets
-        if (isHeader(aPacket[0]) == true) { // determining which file each packet is a part of
-            newHeader(aPacket);
+    public void createPack(byte[] aPacket, int length) throws IOException { // creates the header and data packets
+        if (isHeader(aPacket[0]) == true) {  //adds each created packet to their respective list
+            newHeader(aPacket, length);
         }
         if (isHeader(aPacket[0]) != true) {
             newData(aPacket);
         }
-        // if (theEnd() == true){
-        //     List<DataPacket> sortedList = sortDataList(dataList);
-        //     List<DataPacket> data1 = populate(sortedList);
-        //     List<DataPacket> data2 = populate(sortedList);
-        //     List<DataPacket> data3 = populate(sortedList);
-        //     sortDataPackNum(data1);
-        //     sortDataPackNum(data2);
-        //     sortDataPackNum(data3);
-        //     writeToFile(headerList, data1);
-        //     writeToFile(headerList, data2);
-        //     writeToFile(headerList, data3);
-        // }
-        //put stuff here to run the sorting ONLY when we have all the files
-        //isFinished for the list of headers and list of data packets
-        //one overall method to say if both are true
-    }
-
-    public void returnFiles() throws IOException {
         if (theEnd() == true){
             List<DataPacket> sortedList = sortDataList(dataList);
             List<DataPacket> data1 = populate(sortedList);
@@ -74,23 +54,24 @@ public class PacketManager {
         }
     }
 
-    public void newHeader(byte[] pack) { // creating a header packet
-        byte[] fileName = Arrays.copyOfRange(packet, 2, packet.length);
-        HeaderPacket header = new HeaderPacket(pack[1], fileName);
+    public void newHeader(byte[] pack, int length) { // creating a header packet
+        byte[] fileName = Arrays.copyOfRange(pack, 2, length);
+        HeaderPacket header = new HeaderPacket(pack[1], fileName, pack);
         headerList.add(header); // putting all the header packets into one list
-        // return header;
     }
 
     public void newData(byte[] pack) { // creating a data packet
         int packNum = getPacketNum(pack);
         boolean last = lastPack(pack);
+        if (last == true){ //determining if a data packet is the last packet for its file
+            System.out.println(last);
+        }
         byte[] infoStuff = Arrays.copyOfRange(pack, 4, pack.length);
-        DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last);
+        DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
         dataList.add(data); // putting all the data packets into one list
-        // return data;
     }
 
-    public int getPacketNum(byte[] packet) { // gets the packet number for a data packet
+    public int getPacketNum(byte[] packet) { // gets the packet number for a data packet dealing with the conversion
         int packetNumber;
         int valOne = Byte.toUnsignedInt(packet[2]); // conversion since java supports signed ints (-128 to 127)
         int valTwo = Byte.toUnsignedInt(packet[3]);
@@ -107,46 +88,24 @@ public class PacketManager {
         return last;
     }
 
-    // public int partNum(byte[] packet){
-    // int numOfParts = 0;
-    // if (lastPack(packet) == true){
-    // numOfParts = getPacketNum(packet);
-    // }
-    // return numOfParts;
-    // }
-
-    // public int totalPackets(List<DataPacket> dataList){ //determines number of
-    // total data packets there are
-    // int totalNum = 0;
-    // boolean last;
-    // for (int i = 0; i < dataList.size(); i++){
-    // DataPacket dummy = dataList.get(i);
-    // last = dummy.getLast();
-    // if (last == true){
-    // totalNum = totalNum + dummy.getPacketNumber();
-    // }
-    // }
-    // return totalNum;
-    // }
-
-    public List<DataPacket> sortDataList(List<DataPacket> dataList) { // sorts the list of data packets by file numbers
+    public List<DataPacket> sortDataList(List<DataPacket> dList) { // sorts the list of all data packets by their file numbers
         byte id;
         List<Byte> newList = new ArrayList<Byte>(); // creating a list of the fileID's of each datapacket
-        for (int i = 0; i < dataList.size(); i++) {
-            DataPacket dummy = dataList.get(i);
+        for (int i = 0; i < dList.size(); i++) {
+            DataPacket dummy = dList.get(i);
             id = dummy.getFileID();
-            newList.add(id);
+            newList.add(id); //adding each fileID to newList
         }
         Collections.sort(newList); // sorting the list of fileID's
-        List<DataPacket> sortedID = new ArrayList<DataPacket>();
+        List<DataPacket> sortedID = new ArrayList<DataPacket>(); //a new list which sorted the original list by fileID's
         for (Byte id2 : newList) { // for each byte in the sortedID list
-            sortedID.add(dataList.get(id2)); // adding the corresponding data packet to the new list
+            sortedID.add(dList.get(id2)); // adding the corresponding data packet to the new list
         }
         return sortedID; // now we have a list of the data packets which is sorted by their file numbers
                          // (ex: 111122333333)
     }
 
-    public boolean isDataFinished(){
+    public boolean isDataFinished(){ //determines if the dataPacket list has all the dataPackets it needs
         boolean finished = false;
         int packetTotal = 0;
         int size = dataList.size();
@@ -156,14 +115,14 @@ public class PacketManager {
             if (last == true){
                 packetTotal = packetTotal + pack.getPacketNumber();
             }
-        }
-        if (size == packetTotal){
-            finished = true;
+            if (size == packetTotal+1){
+                finished = true;
+            }
         }
         return finished;
     }
 
-    public boolean isHeaderFinished(){
+    public boolean isHeaderFinished(){ //determines if the header list has 3 headerPackets
         boolean finished = false;
         if (headerList.size() == 3){
             finished = true;
@@ -171,7 +130,7 @@ public class PacketManager {
         return finished;
     }
 
-    public boolean theEnd(){
+    public boolean theEnd(){ //determines if we have all header and data packets for the files
         boolean done = false;
         if (isDataFinished() == true && isHeaderFinished() == true){
             done = true;
@@ -179,38 +138,33 @@ public class PacketManager {
         return done;
     }
 
-    // List<DataPacket> file1Prep = populate(dataList);
-    public List<DataPacket> populate(List<DataPacket> dataList) {
+    /*
+    The original dataPacket list we had at the beginnnng is sorted by fileID, looking something like 1111122223333333
+    This method puts the dataPackets into 3 different lists based on their fileID
+    */
+    public List<DataPacket> populate(List<DataPacket> sortedID) { 
         List<DataPacket> fileList = new ArrayList<DataPacket>();
-        for (int i = 0; i < dataList.size() - 1; i++) {
-            DataPacket dummy = dataList.get(i);
-            DataPacket dummy2 = dataList.get(i + 1);
+        for (int i = 0; i < sortedID.size() - 1; i++) {
+            DataPacket dummy = sortedID.get(i);
+            DataPacket dummy2 = sortedID.get(i + 1);
             // boolean last = dummy2.getLast(dummy2);
             fileList.add(dataList.get(i));
-            dataList.remove(i);
+            sortedID.remove(i);
             if (dummy.getFileID() != dummy2.getFileID()) {
                 return fileList;
             }
         }
-        fileList.add(dataList.get(dataList.size() - 1));
+        fileList.add(sortedID.get(sortedID.size() - 1));
         return fileList;
     }
 
-    // public TreeMap<Integer, byte[]> makeMaps(List<DataPacket> dataList){
-    // //treeMaps are magic and sort entries as they're entered
-    // TreeMap<Integer, byte[]> map = new TreeMap<Integer, byte[]>();
-    // for (int i = 0; i < dataList.size(); i++){
-    // DataPacket dummy = dataList.get(i);
-    // int packNum = dummy.getPacketNumber();
-    // byte[] info = dummy.getDataInfo();
-    // map.put(packNum,info);
-    // }
-    // return map;
-    // }
-
-    // should have lists of DataPackets that are sorted by packetnumber
-    public void sortDataPackNum(List<DataPacket> dataList) { // treeMaps are magic and sort entries as
-                                                                         // they're entered
+    /*
+    This method takes a list that has all the same file ID's and puts each dataPacket into a TreeMap
+    TreeMaps are magic and sort its items as you enter them, so after we put each dataPacket into a TreeMap,
+    we put them back into a list but now the array of bytes that have the information are in order.
+    (ex: packNum1, packNum2,packNum3...)
+    */
+    public void sortDataPackNum(List<DataPacket> dataList) { 
         TreeMap<Integer, DataPacket> map = new TreeMap<Integer, DataPacket>();
         for (int i = 0; i < dataList.size(); i++) {
             DataPacket dummy = dataList.get(i);
@@ -223,38 +177,29 @@ public class PacketManager {
             DataPacket pack = entry.getValue();
             newDataList.add(pack);
         }
-        //return newDataList;
     }
 
-    // public void buildFile(List<HeaderPacket> headerList, TreeMap<Integer,byte[]>
-    // dataMap){ //need to match the header with its data packets
-    // for (int i = 0; i < headerList.size(); i++){
-    // HeaderPacket header = headerList.get(i);
-    // byte ID = header.getFileID();
-    // byte[] name = header.getFileName();
-    // }
-    // }
-    public void writeToFile(List<HeaderPacket> headerList, List<DataPacket> dataList) throws IOException {
+    /*
+    Iterates through the list of headerPackets and sees if it's fileID matches the ID's of the dataPackets
+    If they do match, create a file with the fileName of the header and the info is the corresponding dataPackets
+    */
+    public void writeToFile(List<HeaderPacket> headerList, List<DataPacket> dataList) throws IOException, FileNotFoundException {
         for (int i = 0; i < headerList.size(); i++){
             HeaderPacket head = headerList.get(i);
             byte fileID = head.getFileID();
-            for (int k = 0; k < dataList.size(); k++){
-                DataPacket data = dataList.get(k);
-                byte ID = data.getFileID();
-                if (fileID == ID){
-                    String fileName = new String(head.getFileName());
-                    File file = new File(fileName);
-                    FileOutputStream output = new FileOutputStream(file);
+            String fileName = new String(head.getFileName());
+            File file = new File(fileName);
+            FileOutputStream output = new FileOutputStream(file);
 
-                    for (int j = 0; j < dataList.size(); j++){
-                        output.write(dataList.get(j).info);
-                    }
-                    output.flush();
-                    output.close();
-                    headerList.remove(head);
-                    break;
+            for (int k = 0; k < dataList.size(); k++){
+                DataPacket data2 = dataList.get(k);
+                byte ID = data2.getFileID();
+                if (fileID == ID){
+                    output.write(data2.getDataInfo());
                 }
             }
+            output.flush();
+            output.close();
         }
     }
 }
