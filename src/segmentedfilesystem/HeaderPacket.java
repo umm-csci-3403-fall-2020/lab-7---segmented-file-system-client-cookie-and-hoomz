@@ -15,6 +15,8 @@ public class HeaderPacket {
     }
 
     public byte[] getFileName(){ //returns the fileName of a file given the header packet
+        // byte[] file = Arrays.copyOfRange(packet, 2, packet.length);
+        // return file;
         return this.fileName;
     }
 

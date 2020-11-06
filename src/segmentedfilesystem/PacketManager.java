@@ -48,9 +48,9 @@ public class PacketManager {
             sortDataPackNum(data1);
             sortDataPackNum(data2);
             sortDataPackNum(data3);
-            writeToFile(headerList, data1);
-            writeToFile(headerList, data2);
-            writeToFile(headerList, data3);
+            matchMaker(headerList, data2);
+            matchMaker(headerList, data3);
+            matchMaker(headerList, data1);
         }
     }
 
@@ -88,21 +88,24 @@ public class PacketManager {
         return last;
     }
 
-    public List<DataPacket> sortDataList(List<DataPacket> dList) { // sorts the list of all data packets by their file numbers
-        byte id;
-        List<Byte> newList = new ArrayList<Byte>(); // creating a list of the fileID's of each datapacket
-        for (int i = 0; i < dList.size(); i++) {
+    /*
+    Takes the list of all the data packets and puts them into a TreeMap based on their fileID, thus automatically sorting the
+    file IDs so the data packets are all together with the other datapackets for a file. Then the data packets are put back
+    into a list, but are now sorted by fileID
+    */
+    public List<DataPacket> sortDataList(List<DataPacket> dList){
+        TreeMap<Byte, DataPacket> map = new TreeMap<Byte, DataPacket>();
+        for (int i = 0; i < dList.size(); i++){
             DataPacket dummy = dList.get(i);
-            id = dummy.getFileID();
-            newList.add(id); //adding each fileID to newList
+            byte id = dummy.getFileID();
+            map.put(id, dummy);
         }
-        Collections.sort(newList); // sorting the list of fileID's
-        List<DataPacket> sortedID = new ArrayList<DataPacket>(); //a new list which sorted the original list by fileID's
-        for (Byte id2 : newList) { // for each byte in the sortedID list
-            sortedID.add(dList.get(id2)); // adding the corresponding data packet to the new list
+        List<Byte> sortedID = new ArrayList<Byte>(map.keySet());
+        List<DataPacket> newList = new ArrayList<DataPacket>();
+        for (Byte id2 : sortedID){
+            newList.add(map.get(id2));
         }
-        return sortedID; // now we have a list of the data packets which is sorted by their file numbers
-                         // (ex: 111122333333)
+        return newList;
     }
 
     public boolean isDataFinished(){ //determines if the dataPacket list has all the dataPackets it needs
@@ -180,26 +183,38 @@ public class PacketManager {
     }
 
     /*
-    Iterates through the list of headerPackets and sees if it's fileID matches the ID's of the dataPackets
-    If they do match, create a file with the fileName of the header and the info is the corresponding dataPackets
+    Matches a header with the corresponding dataPackets then calls writeToFile to write them out
     */
-    public void writeToFile(List<HeaderPacket> headerList, List<DataPacket> dataList) throws IOException, FileNotFoundException {
-        for (int i = 0; i < headerList.size(); i++){
-            HeaderPacket head = headerList.get(i);
-            byte fileID = head.getFileID();
-            String fileName = new String(head.getFileName());
-            File file = new File(fileName);
-            FileOutputStream output = new FileOutputStream(file);
-
-            for (int k = 0; k < dataList.size(); k++){
-                DataPacket data2 = dataList.get(k);
-                byte ID = data2.getFileID();
-                if (fileID == ID){
-                    output.write(data2.getDataInfo());
-                }
+    public void matchMaker(List<HeaderPacket> headList, List<DataPacket> infoList)
+            throws FileNotFoundException, IOException {
+        for (int i = 0; i < headList.size(); i++){
+            HeaderPacket head = headList.get(i);
+            byte id = head.getFileID();
+            DataPacket data = infoList.get(0);
+            byte dataID = data.getFileID();
+            if (id == dataID){
+                System.out.println("Match made!");
+                writeToFile(head, infoList);
             }
-            output.flush();
-            output.close();
         }
+    }
+
+    /*
+    Writes out a file with the fileName coming from the headerPacket and the info coming from the list of dataPackets.
+    Utilizes trim to get rid of leading and trailing spaces which affects the fileName
+    */
+    public void writeToFile(HeaderPacket header, List<DataPacket> dataList) throws IOException, FileNotFoundException {
+        String fileName = new String(header.getFileName());
+        fileName = fileName.trim(); //getting rid of any subtle spaces
+        File file = new File(fileName);
+        FileOutputStream output = new FileOutputStream(file);
+
+        for (int k = 0; k < dataList.size(); k++){
+            DataPacket data2 = dataList.get(k);
+            output.write(data2.getDataInfo());
+        }
+        System.out.println("This file was written!!");
+        output.flush();
+        output.close();
     }
 }
