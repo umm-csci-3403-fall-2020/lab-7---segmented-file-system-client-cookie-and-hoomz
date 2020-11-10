@@ -98,22 +98,9 @@ public class PacketManager {
     public Map<Byte, List<DataPacket>> sortDataList(List<DataPacket> dList){
         TreeMap<Byte, List <DataPacket>> map = new TreeMap<Byte, List <DataPacket>>();
 
-        // for (int i = 0; i < dList.size(); i++){
-        //     DataPacket dummy = dList.get(i);
-        //     byte id = dummy.getFileID();
-        //     map.put(id, dummy);
-        // }
-        // List<Byte> sortedID = new ArrayList<Byte>(map.keySet());
-        // List<DataPacket> newList = new ArrayList<DataPacket>();
-        // for (Byte id2 : sortedID){
-
-        //     newList.add(map.get(id2));
-        // }
-        // return newList;
-
         for (DataPacket p: dList){
             byte fileID = p.getFileID();
-            List<DataPacket> packets = new ArrayList <DataPacket>();
+            List<DataPacket> packets = map.get(fileID);
             if (packets == null){
                 packets = new ArrayList <DataPacket>();
                 map.put(fileID, packets);
@@ -160,6 +147,21 @@ public class PacketManager {
     The original dataPacket list we had at the beginnnng is sorted by fileID, looking something like 1111122223333333
     This method puts the dataPackets into 3 different lists based on their fileID
     */
+    // public List<DataPacket> populate(List<DataPacket> sortedID) { 
+    //     List<DataPacket> fileList = new ArrayList<DataPacket>();
+    //     for (int i = 0; i < sortedID.size() - 1; i++) {
+    //         DataPacket dummy = sortedID.get(i);
+    //         DataPacket dummy2 = sortedID.get(i + 1);
+    //         // boolean last = dummy2.getLast(dummy2);
+    //         fileList.add(dataList.get(i));
+    //         sortedID.remove(i);
+    //         if (dummy.getFileID() != dummy2.getFileID()) {
+    //             return fileList;
+    //         }
+    //     }
+    //     fileList.add(sortedID.get(sortedID.size() - 1));
+    //     return fileList;
+    // }
     public List<DataPacket> populate(List<DataPacket> sortedID) { 
         List<DataPacket> fileList = new ArrayList<DataPacket>();
         for (int i = 0; i < sortedID.size() - 1; i++) {
@@ -182,10 +184,10 @@ public class PacketManager {
     we put them back into a list but now the array of bytes that have the information are in order.
     (ex: packNum1, packNum2,packNum3...)
     */
-    public void sortDataPackNum(List<DataPacket> dataList) { 
+    public void sortDataPackNum(List<DataPacket> dataLists) { 
         TreeMap<Integer, DataPacket> map = new TreeMap<Integer, DataPacket>();
-        for (int i = 0; i < dataList.size(); i++) {
-            DataPacket dummy = dataList.get(i);
+        for (int i = 0; i < dataLists.size(); i++) {
+            DataPacket dummy = dataLists.get(i);
             int packNum = dummy.getPacketNumber();
             // byte[] info = dummy.getDataInfo();
             map.put(packNum, dummy);
