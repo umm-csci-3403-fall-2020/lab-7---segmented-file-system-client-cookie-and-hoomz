@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
 
 import segmentedfilesystem.DataPacket;
 import segmentedfilesystem.HeaderPacket;
@@ -19,12 +20,10 @@ public class PacketManager {
     byte[] packet;
     List<HeaderPacket> headerList;
     List<DataPacket> dataList;
-    //List<DataPacket> sortedList;
 
     public PacketManager(){
         this.headerList = new ArrayList<HeaderPacket>(); //list for the header packets
         this.dataList = new ArrayList<DataPacket>(); //list for all the data packets
-        //this.sortedList = new ArrayList<DataPacket>();
     }
 
     public boolean isHeader(byte status) { // determines if a packet is a header packet or not
@@ -40,19 +39,20 @@ public class PacketManager {
             newHeader(aPacket, length);
         }
         if (isHeader(aPacket[0]) != true) {
-            newData(aPacket, length);
+            newData(aPacket);
         }
         if (theEnd() == true){
-            List<DataPacket> sortedList = sortDataList(dataList);
-            List<DataPacket> data1 = populate(sortedList);
-            List<DataPacket> data2 = populate(sortedList);
-            List<DataPacket> data3 = populate(sortedList);
+            Map<Byte, List <DataPacket>> sortedList = sortDataList(dataList);
+            Byte[] uniqueFileIDs = sortedList.keySet().toArray(new Byte[0]);
+            List<DataPacket> data1 = sortedList.get(uniqueFileIDs[0]);
+            List<DataPacket> data2 = sortedList.get(uniqueFileIDs[1]);
+            List<DataPacket> data3 = sortedList.get(uniqueFileIDs[2]);
             sortDataPackNum(data1);
             sortDataPackNum(data2);
             sortDataPackNum(data3);
-            matchMaker(headerList, data1);
             matchMaker(headerList, data2);
             matchMaker(headerList, data3);
+            matchMaker(headerList, data1);
         }
     }
 
@@ -62,13 +62,13 @@ public class PacketManager {
         headerList.add(header); // putting all the header packets into one list
     }
 
-    public void newData(byte[] pack, int length) { // creating a data packet
+    public void newData(byte[] pack) { // creating a data packet
         int packNum = getPacketNum(pack);
         boolean last = lastPack(pack);
         if (last == true){ //determining if a data packet is the last packet for its file
             System.out.println(last);
         }
-        byte[] infoStuff = Arrays.copyOfRange(pack, 4, length);
+        byte[] infoStuff = Arrays.copyOfRange(pack, 4, pack.length);
         DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
         dataList.add(data); // putting all the data packets into one list
     }
@@ -95,19 +95,32 @@ public class PacketManager {
     file IDs so the data packets are all together with the other datapackets for a file. Then the data packets are put back
     into a list, but are now sorted by fileID
     */
-    public List<DataPacket> sortDataList(List<DataPacket> dList){
-        TreeMap<Byte, DataPacket> map = new TreeMap<Byte, DataPacket>();
-        for (int i = 0; i < dList.size(); i++){
-            DataPacket dummy = dList.get(i);
-            byte id = dummy.getFileID();
-            map.put(id, dummy);
+    public Map<Byte, List<DataPacket>> sortDataList(List<DataPacket> dList){
+        TreeMap<Byte, List <DataPacket>> map = new TreeMap<Byte, List <DataPacket>>();
+
+        // for (int i = 0; i < dList.size(); i++){
+        //     DataPacket dummy = dList.get(i);
+        //     byte id = dummy.getFileID();
+        //     map.put(id, dummy);
+        // }
+        // List<Byte> sortedID = new ArrayList<Byte>(map.keySet());
+        // List<DataPacket> newList = new ArrayList<DataPacket>();
+        // for (Byte id2 : sortedID){
+
+        //     newList.add(map.get(id2));
+        // }
+        // return newList;
+
+        for (DataPacket p: dList){
+            byte fileID = p.getFileID();
+            List<DataPacket> packets = new ArrayList <DataPacket>();
+            if (packets == null){
+                packets = new ArrayList <DataPacket>();
+                map.put(fileID, packets);
+            }
+            packets.add(p);
         }
-        List<Byte> sortedID = new ArrayList<Byte>(map.keySet()); //a list of all the fileIDs
-        List<DataPacket> newList = new ArrayList<DataPacket>(); //a new sorted list based on fileIDs
-        for (Byte id2 : sortedID){
-            newList.add(map.get(id2)); //adding the data packets to a new sorted list
-        }
-        return newList;
+        return map;
     }
 
     public boolean isDataFinished(){ //determines if the dataPacket list has all the dataPackets it needs
