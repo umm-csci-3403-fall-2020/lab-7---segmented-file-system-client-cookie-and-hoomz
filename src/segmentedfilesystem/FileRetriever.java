@@ -1,4 +1,5 @@
 package segmentedfilesystem;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -14,8 +15,9 @@ public class FileRetriever {
     public FileRetriever(String server, int port) throws UnknownHostException, SocketException {
         this.server = server;
         this.port = port;
-        DatagramSocket socket = new DatagramSocket();
-	    this.socket = socket;
+        DatagramSocket socket = new DatagramSocket(); //calling FileRetriever will create a new socket
+        this.socket = socket;
+        //this.socket = new DatagramSocket();
     }
 
     public void downloadFiles() throws IOException{ //download and write out the files
@@ -35,6 +37,7 @@ public class FileRetriever {
             byte[] aPacket = data.getData();
             int length = data.getLength();
             boss.createPack(aPacket, length);
+            //aPacket = null;
         }
         System.out.println("The files have been returned");
         socket.close();

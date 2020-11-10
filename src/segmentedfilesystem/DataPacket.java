@@ -21,20 +21,29 @@ public class DataPacket {
         return this.fileID;
     }
 
+    // public boolean getLast(){
+    //     boolean end = false;
+    //     byte status = packet[0];
+    //     if (status % 4 == 3) {
+    //         end = true;
+    //     }
+    //     return end;
+    // }
+
     public boolean getLast(){
-        byte status = packet[0];
-        if (status % 4 == 3) {
-            last = true;
-        }
-        return last;
+        return this.last;
     }
 
+    // public int getPacketNumber(){
+    //     int packetNumber;
+    //     int valOne = Byte.toUnsignedInt(packet[2]); //conversion since java supports signed ints (-128 to 127)
+    //     int valTwo = Byte.toUnsignedInt(packet[3]);
+    //     packetNumber = 256*valOne+valTwo;
+    //     return packetNumber;
+    // }
+
     public int getPacketNumber(){
-        int packetNumber;
-        int valOne = Byte.toUnsignedInt(packet[2]); //conversion since java supports signed ints (-128 to 127)
-        int valTwo = Byte.toUnsignedInt(packet[3]);
-        packetNumber = 256*valOne+valTwo;
-        return packetNumber;
+        return this.packetNumber;
     }
 
     public byte[] getDataInfo(){
