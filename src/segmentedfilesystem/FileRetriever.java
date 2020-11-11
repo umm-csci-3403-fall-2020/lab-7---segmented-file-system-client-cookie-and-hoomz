@@ -37,7 +37,6 @@ public class FileRetriever {
             byte[] aPacket = data.getData();
             int length = data.getLength();
             boss.createPack(aPacket, length);
-            //aPacket = null;
         }
         System.out.println("The files have been returned");
         socket.close();

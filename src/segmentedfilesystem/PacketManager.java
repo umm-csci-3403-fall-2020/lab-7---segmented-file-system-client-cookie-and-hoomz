@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,17 +43,18 @@ public class PacketManager {
             newData(aPacket);
         }
         if (theEnd() == true){
+            System.out.println(dataList.size());
             Map<Byte, List <DataPacket>> sortedList = sortDataList(dataList);
             Byte[] uniqueFileIDs = sortedList.keySet().toArray(new Byte[0]);
             List<DataPacket> data1 = sortedList.get(uniqueFileIDs[0]);
             List<DataPacket> data2 = sortedList.get(uniqueFileIDs[1]);
             List<DataPacket> data3 = sortedList.get(uniqueFileIDs[2]);
-            sortDataPackNum(data1);
-            sortDataPackNum(data2);
-            sortDataPackNum(data3);
-            matchMaker(headerList, data2);
-            matchMaker(headerList, data3);
-            matchMaker(headerList, data1);
+            List<DataPacket> sorted1 = sortDataPackNum(data1);
+            List<DataPacket> sorted2 = sortDataPackNum(data2);
+            List<DataPacket> sorted3 = sortDataPackNum(data3);
+            matchMaker(headerList, sorted1);
+            matchMaker(headerList, sorted2);
+            matchMaker(headerList, sorted3);
         }
     }
 
@@ -96,8 +98,7 @@ public class PacketManager {
     into a list, but are now sorted by fileID
     */
     public Map<Byte, List<DataPacket>> sortDataList(List<DataPacket> dList){
-        TreeMap<Byte, List <DataPacket>> map = new TreeMap<Byte, List <DataPacket>>();
-
+        Map<Byte, List<DataPacket>> map = new HashMap<Byte, List<DataPacket>>();
         for (DataPacket p: dList){
             byte fileID = p.getFileID();
             List<DataPacket> packets = map.get(fileID);
@@ -119,10 +120,13 @@ public class PacketManager {
             boolean last = pack.getLast();
             if (last == true){
                 packetTotal = packetTotal + pack.getPacketNumber();
+                if (size == packetTotal+1){
+                    finished = true;
+                }
             }
-            if (size == packetTotal+1){
-                finished = true;
-            }
+            // if (size == packetTotal+1){
+            //     finished = true;
+            // }
         }
         return finished;
     }
@@ -152,7 +156,6 @@ public class PacketManager {
     //     for (int i = 0; i < sortedID.size() - 1; i++) {
     //         DataPacket dummy = sortedID.get(i);
     //         DataPacket dummy2 = sortedID.get(i + 1);
-    //         // boolean last = dummy2.getLast(dummy2);
     //         fileList.add(dataList.get(i));
     //         sortedID.remove(i);
     //         if (dummy.getFileID() != dummy2.getFileID()) {
@@ -162,21 +165,7 @@ public class PacketManager {
     //     fileList.add(sortedID.get(sortedID.size() - 1));
     //     return fileList;
     // }
-    public List<DataPacket> populate(List<DataPacket> sortedID) { 
-        List<DataPacket> fileList = new ArrayList<DataPacket>();
-        for (int i = 0; i < sortedID.size() - 1; i++) {
-            DataPacket dummy = sortedID.get(i);
-            DataPacket dummy2 = sortedID.get(i + 1);
-            // boolean last = dummy2.getLast(dummy2);
-            fileList.add(dataList.get(i));
-            sortedID.remove(i);
-            if (dummy.getFileID() != dummy2.getFileID()) {
-                return fileList;
-            }
-        }
-        fileList.add(sortedID.get(sortedID.size() - 1));
-        return fileList;
-    }
+    
 
     /*
     This method takes a list that has all the same file ID's and puts each dataPacket into a TreeMap
@@ -184,12 +173,11 @@ public class PacketManager {
     we put them back into a list but now the array of bytes that have the information are in order.
     (ex: packNum1, packNum2,packNum3...)
     */
-    public void sortDataPackNum(List<DataPacket> dataLists) { 
+    public List<DataPacket> sortDataPackNum(List<DataPacket> dataLists) { 
         TreeMap<Integer, DataPacket> map = new TreeMap<Integer, DataPacket>();
         for (int i = 0; i < dataLists.size(); i++) {
             DataPacket dummy = dataLists.get(i);
             int packNum = dummy.getPacketNumber();
-            // byte[] info = dummy.getDataInfo();
             map.put(packNum, dummy);
         }
         List<DataPacket> newDataList = new ArrayList<DataPacket>();
@@ -197,6 +185,7 @@ public class PacketManager {
             DataPacket pack = entry.getValue();
             newDataList.add(pack);
         }
+        return newDataList;
     }
 
     /*
