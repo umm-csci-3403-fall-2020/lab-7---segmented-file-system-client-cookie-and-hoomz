@@ -133,7 +133,7 @@ public class PacketManager {
             boolean last = pack.getLast();
             if (last == true){
                 packetTotal = packetTotal + pack.getPacketNumber();
-                if (size == packetTotal+1){
+                if (size == packetTotal+3){
                     finished = true;
                 }
             }
