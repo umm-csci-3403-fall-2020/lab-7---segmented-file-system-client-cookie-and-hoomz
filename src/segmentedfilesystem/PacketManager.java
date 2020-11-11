@@ -39,8 +39,11 @@ public class PacketManager {
         if (isHeader(aPacket[0]) == true) {  //adds each created packet to their respective list
             newHeader(aPacket, length);
         }
+        // if (isHeader(aPacket[0]) != true) {
+        //     newData(aPacket);
+        // }
         if (isHeader(aPacket[0]) != true) {
-            newData(aPacket);
+            newData(aPacket, length);
         }
         if (theEnd() == true){
             System.out.println(dataList.size());
@@ -64,13 +67,23 @@ public class PacketManager {
         headerList.add(header); // putting all the header packets into one list
     }
 
-    public void newData(byte[] pack) { // creating a data packet
+    // public void newData(byte[] pack) { // creating a data packet
+    //     int packNum = getPacketNum(pack);
+    //     boolean last = lastPack(pack);
+    //     if (last == true){ //determining if a data packet is the last packet for its file
+    //         System.out.println(last);
+    //     }
+    //     byte[] infoStuff = Arrays.copyOfRange(pack, 4, pack.length);
+    //     DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
+    //     dataList.add(data); // putting all the data packets into one list
+    // }
+    public void newData(byte[] pack, int length) { // creating a data packet
         int packNum = getPacketNum(pack);
         boolean last = lastPack(pack);
         if (last == true){ //determining if a data packet is the last packet for its file
             System.out.println(last);
         }
-        byte[] infoStuff = Arrays.copyOfRange(pack, 4, pack.length);
+        byte[] infoStuff = Arrays.copyOfRange(pack, 4, length);
         DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
         dataList.add(data); // putting all the data packets into one list
     }
