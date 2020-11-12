@@ -49,4 +49,8 @@ public class DataPacket {
     public byte[] getDataInfo(){
         return this.info;
     }
+
+    // public class sortByNum() implements Comparator{
+
+    // }
 }

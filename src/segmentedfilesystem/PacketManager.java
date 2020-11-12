@@ -126,16 +126,19 @@ public class PacketManager {
 
     public boolean isDataFinished(){ //determines if the dataPacket list has all the dataPackets it needs
         boolean finished = false;
-        int packetTotal = 0;
+        int packetTotal = 3;
+        int footerCounter = 0;
         int size = dataList.size();
         for (int i = 0; i < dataList.size(); i++){
             DataPacket pack = dataList.get(i);
-            boolean last = pack.getLast();
-            if (last == true){
-                packetTotal = packetTotal + pack.getPacketNumber();
-                if (size == packetTotal+3){
-                    finished = true;
-                }
+            //boolean last = pack.getLast();
+            if (pack.getLast()){
+                packetTotal += pack.getPacketNumber();
+                footerCounter++;
+            }
+            if (footerCounter == 3 && size == packetTotal){
+                finished = true;
+                return finished;
             }
             // if (size == packetTotal+1){
             //     finished = true;
@@ -143,6 +146,15 @@ public class PacketManager {
         }
         return finished;
     }
+
+    // public boolean isDataFinished(){ //determines if the dataPacket list has all the dataPackets it needs
+    //     boolean notDone = true;
+    //     int counter;
+    //     int footerCounter;
+    //     int totalPackets;
+    //     if ()
+    //     return false;
+    // }
 
     public boolean isHeaderFinished(){ //determines if the header list has 3 headerPackets
         boolean finished = false;
@@ -213,6 +225,7 @@ public class PacketManager {
             byte dataID = data.getFileID();
             if (id == dataID){
                 System.out.println("Match made!");
+                System.out.println(infoList.size());
                 writeToFile(head, infoList);
             }
         }
