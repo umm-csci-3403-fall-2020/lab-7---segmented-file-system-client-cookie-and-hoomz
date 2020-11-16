@@ -101,7 +101,7 @@ public class PacketManager {
         for (int i = 0; i < packet.length; i++){
             if (packet[i] != 0){ newLength++; }
         }
-        packet = Arrays.copyOfRange(packet, 0, newLength); 
+        packet = Arrays.copyOfRange(packet, 0, newLength + 1); 
         return packet;
     }
 
