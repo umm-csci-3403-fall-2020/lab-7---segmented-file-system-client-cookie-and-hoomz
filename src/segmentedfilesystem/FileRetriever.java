@@ -34,6 +34,7 @@ public class FileRetriever {
             DatagramPacket data = new DatagramPacket(buffer2,buffer2.length);
             socket.receive(data); //receive the incoming packet
             System.out.println("Data received");
+            System.out.println(data.getLength());
             byte[] aPacket = data.getData();
             int length = data.getLength();
             boss.createPack(aPacket, length);

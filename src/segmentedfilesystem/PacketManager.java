@@ -67,25 +67,42 @@ public class PacketManager {
         headerList.add(header); // putting all the header packets into one list
     }
 
-    // public void newData(byte[] pack) { // creating a data packet
-    //     int packNum = getPacketNum(pack);
-    //     boolean last = lastPack(pack);
-    //     if (last == true){ //determining if a data packet is the last packet for its file
-    //         System.out.println(last);
-    //     }
-    //     byte[] infoStuff = Arrays.copyOfRange(pack, 4, pack.length);
-    //     DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
-    //     dataList.add(data); // putting all the data packets into one list
-    // }
     public void newData(byte[] pack, int length) { // creating a data packet
         int packNum = getPacketNum(pack);
         boolean last = lastPack(pack);
         if (last == true){ //determining if a data packet is the last packet for its file
+            pack = trimPackage(pack);
             System.out.println(last);
         }
-        byte[] infoStuff = Arrays.copyOfRange(pack, 4, length);
+        byte[] infoStuff = trimPackage(pack);
         DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
         dataList.add(data); // putting all the data packets into one list
+    }
+
+    // public void newData(byte[] pack, int length) { // creating a data packet
+    //     String stringPack = new String(pack);
+    //     stringPack = stringPack.trim();
+    //     byte[] trimPack = stringPack.getBytes();
+
+    //     int packNum = getPacketNum(trimPack);
+    //     boolean last = lastPack(trimPack);
+    //     if (last == true){ //determining if a data packet is the last packet for its file
+    //         System.out.println(last);
+    //     }
+    //     byte[] infoStuff = Arrays.copyOfRange(trimPack, 4, trimPack.length);
+    //     DataPacket data = new DataPacket(trimPack[1], packNum, infoStuff, last, trimPack);
+    //     dataList.add(data); // putting all the data packets into one list
+    // }
+
+    public byte[] trimPackage(byte[] packet){
+
+        int newLength = 0;
+
+        for (int i = 0; i < packet.length; i++){
+            if (packet[i] != 0){ newLength++; }
+        }
+        packet = Arrays.copyOfRange(packet, 0, newLength); 
+        return packet;
     }
 
     public int getPacketNum(byte[] packet) { // gets the packet number for a data packet dealing with the conversion
