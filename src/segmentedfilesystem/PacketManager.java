@@ -67,9 +67,9 @@ public class PacketManager {
         int packNum = getPacketNum(pack);
         boolean last = lastPack(pack);
         if (last == true){ //determining if a data packet is the last packet for its file
-            pack = trimPack(pack);
+            pack = trimPack(pack, length);
         }
-        byte[] infoStuff = trimPack(pack); //trimming any unused space in the buffer
+        byte[] infoStuff = trimPack(pack, length); //trimming any unused space in the buffer
         DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
         dataList.add(data); // putting all the data packets into one list
     }
@@ -78,14 +78,8 @@ public class PacketManager {
     This method is mainly for the last packets for each file. It's supposed to trim the empty space in the 
     array of bytes since the last packet won't fill the entire 1028 bit buffer it's given
     */
-    public byte[] trimPack(byte[] packet){
-
-        int newLength = 0; //the new trimmed length
-
-        for (int i = 0; i < packet.length; i++){
-            if (packet[i] != 0){ newLength++; } //placeholder in an array is 0
-        }
-        packet = Arrays.copyOfRange(packet, 0, newLength+1); 
+    public byte[] trimPack(byte[] packet, int length){
+        packet = Arrays.copyOfRange(packet, 0, length); 
         return packet;
     }
 
