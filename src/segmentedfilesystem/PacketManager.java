@@ -80,10 +80,10 @@ public class PacketManager {
     */
     public byte[] trimPack(byte[] packet){
 
-        int newLength = 1;
+        int newLength = 0; //the new trimmed length
 
         for (int i = 0; i < packet.length; i++){
-            if (packet[i] != 0){ newLength++; }
+            if (packet[i] != 0){ newLength++; } //placeholder in an array is 0
         }
         packet = Arrays.copyOfRange(packet, 0, newLength+1); 
         return packet;
