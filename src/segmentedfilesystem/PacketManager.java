@@ -6,15 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Set;
-
-import segmentedfilesystem.DataPacket;
-import segmentedfilesystem.HeaderPacket;
 
 public class PacketManager {
 
@@ -35,13 +30,14 @@ public class PacketManager {
         return header;
     }
 
-    public void createPack(byte[] aPacket, int length) throws IOException { // creates the header and data packets
-        if (isHeader(aPacket[0]) == true) {  //adds each created packet to their respective list
+    /*
+    This method will take the array of bytes and calculated length and create either a dataPacket or headerPacket. 
+    It uses the isHeader method as a way to determine if the given array of bytes is either a dataPacket or headerPacket
+    */
+    public void createPack(byte[] aPacket, int length) throws IOException { 
+        if (isHeader(aPacket[0]) == true) {  
             newHeader(aPacket, length);
         }
-        // if (isHeader(aPacket[0]) != true) {
-        //     newData(aPacket);
-        // }
         if (isHeader(aPacket[0]) != true) {
             newData(aPacket, length);
         }
@@ -71,37 +67,25 @@ public class PacketManager {
         int packNum = getPacketNum(pack);
         boolean last = lastPack(pack);
         if (last == true){ //determining if a data packet is the last packet for its file
-            pack = trimPackage(pack);
-            System.out.println(last);
+            pack = trimPack(pack);
         }
-        byte[] infoStuff = trimPackage(pack);
+        byte[] infoStuff = trimPack(pack); //trimming any unused space in the buffer
         DataPacket data = new DataPacket(pack[1], packNum, infoStuff, last, pack);
         dataList.add(data); // putting all the data packets into one list
     }
 
-    // public void newData(byte[] pack, int length) { // creating a data packet
-    //     String stringPack = new String(pack);
-    //     stringPack = stringPack.trim();
-    //     byte[] trimPack = stringPack.getBytes();
+    /*
+    This method is mainly for the last packets for each file. It's supposed to trim the empty space in the 
+    array of bytes since the last packet won't fill the entire 1028 bit buffer it's given
+    */
+    public byte[] trimPack(byte[] packet){
 
-    //     int packNum = getPacketNum(trimPack);
-    //     boolean last = lastPack(trimPack);
-    //     if (last == true){ //determining if a data packet is the last packet for its file
-    //         System.out.println(last);
-    //     }
-    //     byte[] infoStuff = Arrays.copyOfRange(trimPack, 4, trimPack.length);
-    //     DataPacket data = new DataPacket(trimPack[1], packNum, infoStuff, last, trimPack);
-    //     dataList.add(data); // putting all the data packets into one list
-    // }
-
-    public byte[] trimPackage(byte[] packet){
-
-        int newLength = 0;
+        int newLength = 1;
 
         for (int i = 0; i < packet.length; i++){
             if (packet[i] != 0){ newLength++; }
         }
-        packet = Arrays.copyOfRange(packet, 0, newLength + 1); 
+        packet = Arrays.copyOfRange(packet, 0, newLength+1); 
         return packet;
     }
 
@@ -157,21 +141,9 @@ public class PacketManager {
                 finished = true;
                 return finished;
             }
-            // if (size == packetTotal+1){
-            //     finished = true;
-            // }
         }
         return finished;
     }
-
-    // public boolean isDataFinished(){ //determines if the dataPacket list has all the dataPackets it needs
-    //     boolean notDone = true;
-    //     int counter;
-    //     int footerCounter;
-    //     int totalPackets;
-    //     if ()
-    //     return false;
-    // }
 
     public boolean isHeaderFinished(){ //determines if the header list has 3 headerPackets
         boolean finished = false;
@@ -188,26 +160,6 @@ public class PacketManager {
         }
         return done;
     }
-
-    /*
-    The original dataPacket list we had at the beginnnng is sorted by fileID, looking something like 1111122223333333
-    This method puts the dataPackets into 3 different lists based on their fileID
-    */
-    // public List<DataPacket> populate(List<DataPacket> sortedID) { 
-    //     List<DataPacket> fileList = new ArrayList<DataPacket>();
-    //     for (int i = 0; i < sortedID.size() - 1; i++) {
-    //         DataPacket dummy = sortedID.get(i);
-    //         DataPacket dummy2 = sortedID.get(i + 1);
-    //         fileList.add(dataList.get(i));
-    //         sortedID.remove(i);
-    //         if (dummy.getFileID() != dummy2.getFileID()) {
-    //             return fileList;
-    //         }
-    //     }
-    //     fileList.add(sortedID.get(sortedID.size() - 1));
-    //     return fileList;
-    // }
-    
 
     /*
     This method takes a list that has all the same file ID's and puts each dataPacket into a TreeMap
